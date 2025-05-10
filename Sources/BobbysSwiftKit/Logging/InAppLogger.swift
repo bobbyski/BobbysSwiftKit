@@ -18,7 +18,7 @@ public class InAppLoggerNode: Identifiable, Codable
 
 public class InAppLogger
 {
-    public static var shared = InAppLogger()
+    nonisolated(unsafe) public static var shared = InAppLogger()
     public var max: Int = 200
     public var nodes: [InAppLoggerNode] = []
     

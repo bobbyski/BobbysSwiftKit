@@ -21,7 +21,7 @@ public enum LogLevel: String
 
 public class Logger
 {
-    public static var shared = Logger()
+    nonisolated(unsafe) public static let shared = Logger()
     
     public static let INFO: String = "INFO"
     public static let COMMAND: String = "COMMAND"
