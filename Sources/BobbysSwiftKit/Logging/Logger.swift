@@ -30,6 +30,7 @@ public class Logger
     public static let WARNING: String = "WARNING"
     public static let ERROR: String = "ERROR"
     public static let COMM: String = "COMM"
+    public static let OBJECT: String = "OBJECT"
     
     public var logLevel: LogLevel = .comm
     
@@ -43,7 +44,8 @@ public class Logger
                                             "RESULT": "\u{001B}[35m",
                                             "DEBUG": "\u{001B}[34m",
                                             "WARNING": "\u{001B}[33m",
-                                            "ERROR": "\u{001B}[31m"
+                                            "ERROR": "\u{001B}[31m",
+                                            "OBJECT": "\u{001B}[31m"
                                           ]
     public var offString = "\u{001B}[0m"
     
@@ -54,7 +56,8 @@ public class Logger
                                             "RESULT": "🟢",
                                             "DEBUG": "🪲",
                                             "WARNING": "🟡",
-                                            "ERROR": "🔴"
+                                            "ERROR": "🔴",
+                                            "OBJECT": "🎁"
                                           ]
     
 //    🔴: Large Red Circle (U+1F534)
@@ -72,6 +75,7 @@ public class Logger
 //    Geometric Shapes (Unicode block)
 //
 //      🪲
+//      🎁
 //
 
     public var logComms: Bool = false
@@ -109,6 +113,19 @@ public class Logger
         }
     }
     
+    public func objectInfo( _ theObject: AnyObject, _ message: String? = nil )
+    {
+        var mess = message ?? "\(String(describing: theObject))"
+        let address = AnyObjectHelper.getMemoryAddressAsString( theObject )
+        
+        if !mess.contains( address )
+        {
+            mess += "\nLocated at: \(address)"
+        }
+        mess += "\n \(theObject)"
+        
+        log( mess, level: Logger.OBJECT )
+    }
     
     public func error(_ message: String)
     {
