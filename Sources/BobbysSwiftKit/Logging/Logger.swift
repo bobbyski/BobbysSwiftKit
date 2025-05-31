@@ -13,8 +13,8 @@ public enum LogLevel: String
     case error = "ERROR WARNING "
     case info = "ERROR WARNING INFO "
     case commands = "ERROR WARNING INFO COMMAND RESULT "
-    case debug = "ERROR WARNING INFO COMMAND RESULT DEBUG "
-    case comm = "ERROR WARNING INFO COMMAND RESULT DEBUG COMM "
+    case debug = "ERROR WARNING INFO COMMAND RESULT DATA DEBUG "
+    case comm = "ERROR WARNING INFO COMMAND RESULT DEBUG DATA COMM "
 }
 
 // public static var logger: (( _ request: URLRequest?, _ response: URLResponse?, _ message: String?, _ data: Data?, _ dataString: String?, _ error: Error? ) -> Void)?
@@ -31,6 +31,7 @@ public class Logger
     public static let ERROR: String = "ERROR"
     public static let COMM: String = "COMM"
     public static let OBJECT: String = "OBJECT"
+    public static let DATA: String = "DATA"
     
     public var logLevel: LogLevel = .comm
     
@@ -45,7 +46,8 @@ public class Logger
                                             "DEBUG": "\u{001B}[34m",
                                             "WARNING": "\u{001B}[33m",
                                             "ERROR": "\u{001B}[31m",
-                                            "OBJECT": "\u{001B}[31m"
+                                            "OBJECT": "\u{001B}[31m",
+                                            "DATA": "\u{001B}[31m"
                                           ]
     public var offString = "\u{001B}[0m"
     
@@ -57,7 +59,8 @@ public class Logger
                                             "DEBUG": "🪲",
                                             "WARNING": "🟡",
                                             "ERROR": "🔴",
-                                            "OBJECT": "🎁"
+                                            "OBJECT": "🎁",
+                                            "DATA": "🟩",
                                           ]
     
 //    🔴: Large Red Circle (U+1F534)
@@ -142,6 +145,11 @@ public class Logger
         log(message, level: Logger.COMM )
     }
     
+    public func data(_ data: Data, message: String? = nil )
+    {
+        logData( data, message: message, level: Logger.DATA )
+    }
+    
     public func log(_ message: String, level: String = INFO )
     {
         var message = message
@@ -153,6 +161,20 @@ public class Logger
                 destination(self, message, level)
             }
         }
+    }
+    
+    public func logData(_ data: Data, message: String? = nil, level: String = DATA )
+    {
+        var str = ""
+        
+        if let message
+        {
+            str += message + "\n"
+        }
+        
+        str += data.asReadableString()
+        
+        log( str, level: level )
     }
     
     public static func getShortDateTimeString( date: Date = Date()) -> String {
@@ -281,6 +303,27 @@ extension Data {
         }
         
         return result
+    }
+    
+    func asReadableString() -> String {
+        return self.asString() ?? toHexWithASCII()
+    }
+    
+    func asString() -> String? {
+        // Attempt to convert Data to a string
+        guard let string = String(data: self, encoding: .utf8) else {
+            return nil // Return nil if the data can't be converted to a valid UTF-8 string
+        }
+        
+        // Check if all characters are displayable or whitespace
+        for character in string {
+            if !(character.isASCII && (character.isLetter || character.isNumber || character.isWhitespace || character.isPunctuation || character.isSymbol)) {
+                return nil // Return nil if a non-displayable character is found
+            }
+        }
+        
+        // Return the string if all characters are valid
+        return string
     }
 }
 
