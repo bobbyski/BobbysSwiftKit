@@ -177,12 +177,13 @@ public class Logger
         log( str, level: level )
     }
     
+    nonisolated(unsafe) public static var dateStyle: DateFormatter.Style = .short
     nonisolated(unsafe) public static var timeStyle: DateFormatter.Style = .short
     
     public static func getShortDateTimeString( date: Date = Date()) -> String {
         let formatter = DateFormatter() // Create a formatter
-        formatter.dateStyle = timeStyle // Use short date style (e.g., MM/dd/yy)
-        formatter.timeStyle = .short // Use short time style (e.g., h:mm a)
+        formatter.dateStyle = Logger.dateStyle // Use short date style (e.g., MM/dd/yy)
+        formatter.timeStyle = Logger.timeStyle // Use short time style (e.g., h:mm a)
         
         return formatter.string(from: date) // Format the date and time
     }
